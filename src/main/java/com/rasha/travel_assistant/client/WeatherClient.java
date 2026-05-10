@@ -48,8 +48,11 @@ public class WeatherClient {
                             + "°C, "
                             + response.getCurrent().getCondition().getText();
                 })
+                .doOnError(error -> System.out.println(error.getMessage()))
                 .onErrorResume(error ->
-                        Mono.just("Weather service is currently unavailable for " + city)
+                        Mono.just(
+                                "Weather service error: " + error.getMessage()
+                        )
                 );
     }
 

@@ -48,10 +48,11 @@ public class OpenAiClient {
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(String.class)
+                .doOnError(error -> System.out.println(error.getMessage()))
                 .onErrorResume(error ->
                         Mono.just(
                                 "AI travel advice is currently unavailable. " +
-                                        "Please check local travel recommendations for " + city
+                                        error.getMessage()
                         )
                 );
     }
