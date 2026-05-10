@@ -5,6 +5,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Component
 public class OpenAiClient {
@@ -22,7 +23,8 @@ public class OpenAiClient {
 
     @Retry(name = "openAiApi")
     @CircuitBreaker(name = "openAiApi", fallbackMethod = "openAiFallback")
-    public String getTravelAdvice(String city, String weatherSummary) {
+    public Mono<String> getTravelAdvice(String city, String weatherSummary) {
+
         String requestBody = """
                 {
                   "model": "gpt-4o-mini",
@@ -46,10 +48,22 @@ public class OpenAiClient {
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(String.class)
-                .block();
+                .onErrorResume(error ->
+                        Mono.just(
+                                "AI travel advice is currently unavailable. " +
+                                        "Please check local travel recommendations for " + city
+                        )
+                );
     }
 
-    public String openAiFallback(String city, String weatherSummary, Throwable throwable) {
-        return "AI travel advice is currently unavailable. Please check local travel recommendations for " + city;
+    public Mono<String> openAiFallback(
+            String city,
+            String weatherSummary,
+            Throwable throwable
+    ) {
+        return Mono.just(
+                "AI travel advice is currently unavailable. " +
+                        "Please check local travel recommendations for " + city
+        );
     }
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -14,7 +15,7 @@ public class TravelController {
     private final TravelService travelService;
 
     @GetMapping("/api/travel")
-    public TravelResponse getTravelAdvice(@RequestParam String city) {
+    public Mono<TravelResponse> getTravelAdvice(@RequestParam String city) {
         return travelService.getTravelAdvice(city);
     }
 }
