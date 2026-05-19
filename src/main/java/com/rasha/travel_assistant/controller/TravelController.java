@@ -1,6 +1,6 @@
 package com.rasha.travel_assistant.controller;
 
-import com.rasha.travel_assistant.dto.TravelResponse;
+import com.rasha.travel_assistant.dto.RecommendationResponse;
 import com.rasha.travel_assistant.service.TravelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +14,8 @@ public class TravelController {
 
     private final TravelService travelService;
 
-    @GetMapping("/api/travel")
-    public Mono<TravelResponse> getTravelAdvice(@RequestParam String city) {
-        return travelService.getTravelAdvice(city);
+    @GetMapping("/api/recommendations")
+    public Mono<RecommendationResponse> getRecommendations(@RequestParam String location) {
+        return travelService.getRecommendations(location);
     }
 }

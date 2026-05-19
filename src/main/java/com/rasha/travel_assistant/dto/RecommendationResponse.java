@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TravelResponse {
-    private String city;
+public class RecommendationResponse {
+    private String location;
     private String weatherSummary;
-    private String travelAdvice;
+    private String recommendationType;
+    private List<String> activities;
 }
