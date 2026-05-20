@@ -1,234 +1,139 @@
 # Travel Assistant API
 
-A reactive Spring Boot backend application that provides travel recommendations using WeatherAPI and OpenAI APIs.
+Detta är ett backendprojekt byggt med Spring Boot för en individuell laboration.  
+Applikationen ger rese- och aktivitetsrekommendationer baserat på vädret i en stad.
+
+## Projektidé
+
+Användaren skickar namnet på en stad.  
+Applikationen:
+
+1. Hämtar aktuellt väder från WeatherAPI.
+2. Väljer en lämplig aktivitetstyp beroende på vädret.
+3. Hämtar rekommenderade platser via Geoapify API.
+4. Returnerar rekommendationer till användaren.
+
+Exempel:
+
+- Regnigt väder → museum eller inomhusaktiviteter
+- Soligt väder → parker eller utomhusaktiviteter
+- Molnigt väder → caféer eller sightseeing
 
 ---
 
-# Features
+## Teknologier
 
-* Get real-time weather information for any city
-* Generate AI-powered travel advice
-* Reactive programming with Spring WebFlux
-* Swagger/OpenAPI documentation
-* Resilience4j Retry & Circuit Breaker
-* Global exception handling
-* Environment variable support for API keys
-* Fallback responses when external APIs fail
-
----
-
-# Tech Stack
-
-* Java 17
-* Spring Boot 3
-* Spring WebFlux
-* WebClient
-* OpenAI API
-* WeatherAPI
-* Resilience4j
-* Swagger / OpenAPI
-* Maven
-* Lombok
+- Java 17
+- Spring Boot
+- Spring WebFlux
+- WebClient
+- Resilience4j
+- WeatherAPI
+- Geoapify API
+- Swagger / OpenAPI
+- Maven
+- Lombok
 
 ---
 
-# Project Structure
+## API Endpoint
+
+```http
+GET /api/recommendations?location=Gothenburg
+```
+
+Exempel:
 
 ```text
-src/main/java/com/rasha/travel_assistant
-│
-├── client
-│   ├── OpenAiClient.java
-│   └── WeatherClient.java
-│
-├── config
-│   └── WebClientConfig.java
-│
-├── controller
-│   └── TravelController.java
-│
-├── dto
-│   ├── TravelResponse.java
-│   └── WeatherResponse.java
-│
-├── exception
-│   └── GlobalExceptionHandler.java
-│
-├── service
-│   └── TravelService.java
-│
-└── TravelAssistantApplication.java
+http://localhost:8080/api/recommendations?location=Gothenburg
 ```
 
----
-
-# API Endpoint
-
-## Get Travel Advice
-
-```http
-GET /api/travel?city=London
-```
-
-### Example Request
-
-```http
-http://localhost:8080/api/travel?city=Stockholm
-```
-
-### Example Response
+## Exempel på svar
 
 ```json
 {
-  "city": "Stockholm",
-  "weatherSummary": "18.2°C, Sunny",
-  "travelAdvice": "Perfect weather for sightseeing and walking tours."
+  "location": "Gothenburg",
+  "weatherSummary": "Sunny",
+  "recommendationType": "park",
+  "activities": [
+    "Walk in a city park",
+    "Visit an outdoor viewpoint",
+    "Explore the city center"
+  ]
 }
 ```
 
----
+## Resilience4j
 
-# Swagger Documentation
+Projektet använder Resilience4j för att göra applikationen mer feltolerant.
 
-After running the application:
+Implementerade funktioner:
+
+- Retry
+- Circuit Breaker
+- Fallback-metoder
+
+Om ett externt API inte fungerar returnerar applikationen fallback-data istället för att krascha.
+
+Externa API:er
+### WeatherAPI
+
+Används för att hämta aktuellt väder för en stad.
+
+### Geoapify API
+
+Används för att hitta aktiviteter och platser baserat på stad och aktivitetstyp.
+
+## Konfiguration
+
+API-nycklar ska inte laddas upp till GitHub.
+
+Använd miljövariabler:
+
+```properties
+WEATHER_API_KEY=your_weather_api_key_here
+GEOAPIFY_API_KEY=your_geoapify_api_key_here
+```
+
+I application.properties:
+
+```properties
+weather.api.key=${WEATHER_API_KEY:dummy-weather-key}
+geoapify.api.key=${GEOAPIFY_API_KEY:dummy-geoapify-key}
+```
+
+## Swagger
+
+Swagger UI finns här efter att applikationen startats:
 
 ```text
 http://localhost:8080/swagger-ui.html
 ```
 
----
+## Hur man kör projektet
 
-# Environment Variables
-
-Create a `.env` file or use environment variables:
-
-```env
-OPENAI_API_KEY=your_openai_api_key
-WEATHER_API_KEY=your_weather_api_key
-```
-
----
-
-# application.properties
-
-```properties
-spring.application.name=travel-assistant
-server.port=8080
-
-openai.api.key=${OPENAI_API_KEY:dummy-openai-key}
-weather.api.key=${WEATHER_API_KEY:dummy-weather-key}
-```
-
----
-
-# Resilience4j Configuration
-
-The application includes:
-
-* Retry mechanism
-* Circuit breaker
-* Fallback responses
-
-This improves stability when external APIs are unavailable or rate-limited.
-
----
-
-# Running the Project
-
-## Clone the repository
+Klona projektet:
 
 ```bash
-git clone <your-repository-url>
+git clone <repository-url>
+```
+
+Gå till projektmappen:
+
+```bash
 cd travel-assistant
 ```
 
----
-
-## Build the project
-
-```bash
-mvn clean install
-```
-
----
-
-## Run the application
+Starta applikationen:
 
 ```bash
 mvn spring-boot:run
 ```
 
-Or run `TravelAssistantApplication.java` directly from IntelliJ IDEA.
+Eller kör TravelAssistantApplication direkt från IntelliJ.
 
----
 
-# Testing the API
+Författare
 
-You can test using:
-
-* Swagger UI
-* Browser
-* Postman
-* curl
-
-Example:
-
-```bash
-curl "http://localhost:8080/api/travel?city=Paris"
-```
-
----
-
-# Error Handling
-
-The application handles:
-
-* External API failures
-* Missing API keys
-* OpenAI rate limits
-* Invalid requests
-
-Using:
-
-* Global exception handler
-* Fallback methods
-* Resilience4j
-
----
-
-# Notes
-
-* OpenAI free accounts may return:
-
-```text
-429 Too Many Requests
-```
-
-if billing/quota is not enabled.
-
-* Weather API may return:
-
-```text
-401 Unauthorized
-```
-
-if the API key is invalid.
-
----
-
-# Future Improvements
-
-* Add caching
-* Add unit tests
-* Add Docker support
-* Add authentication
-* Save travel history in database
-* Frontend integration
-
----
-
-# Author
-
-Rasha khatib 
-
-Fullstack Java Student — Göteborg 
+Rasha khatib
+Fullstack Java Student
